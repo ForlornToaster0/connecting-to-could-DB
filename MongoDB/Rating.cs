@@ -8,43 +8,41 @@ namespace MongoDB
 
         public static void Rate(string Connect)
         {
-            int found = Find(Connect);
             var client = new MongoClient(Connect);
 
 
             IMongoDatabase db = client.GetDatabase("myFirstDatabase");
 
             var movie = db.GetCollection<BsonDocument>("Geek_Rating.Media");
-            int docNum= Find(Connect);
+            int docNum = Find(Connect, "true", "Rating");
             Console.WriteLine("What do you want to rate?");
             var builder = Builders<BsonDocument>.Filter;
             var FilterArray = builder.Exists("SlysPoints");
             var doc = movie.Find(!FilterArray).Project("{Media: 0, _id:0,SlysPoints:0}").ToList();
             int i = 0;
-            char[] Trimming = { '{', '}' };
 
-                Console.WriteLine("What's it rating?");
+            Console.WriteLine("What's it rating?");
 
-                string input2 = Console.ReadLine();
-                if (input2 != null)
+            string input2 = Console.ReadLine();
+            if (input2 != null)
+            {
+                int rating = int.Parse(input2);
+
+                Console.WriteLine("when did you watch it? YYYY-MM-DD");
+                string date = Console.ReadLine();
+                if (date != null)
                 {
-                    int rating = int.Parse(input2);
-
-                    Console.WriteLine("when did you watch it? YYYY-MM-DD");
-                    string date = Console.ReadLine();
-                    if (date != null)
-                    {
-                        var Update = Builders<BsonDocument>.Update.Push("SlysPoints", new BsonDocument { { "Points", rating }, { "Watched", date } });
+                    var Update = Builders<BsonDocument>.Update.Push("SlysPoints", new BsonDocument { { "Points", rating }, { "Watched", date } });
 
 
 
-                        movie.UpdateOne(doc[docNum], Update);
-                    }
-                
+                    movie.UpdateOne(doc[docNum], Update);
+                }
+
             }
 
         }
-        static int Find(string Connect)
+        public static int Find(string Connect, string Media, string Using)
         {
             var client = new MongoClient(Connect);
 
@@ -53,9 +51,32 @@ namespace MongoDB
 
             var movie = db.GetCollection<BsonDocument>("Geek_Rating.Media");
 
-            Console.WriteLine("What do you want to rate?");
-            var FilterArray = Builders<BsonDocument>.Filter.Exists("SlysPoints");
-            var doc = movie.Find(!FilterArray).Project("{Media: 0, _id:0,SlysPoints:0}").ToList();
+            var FilterArray = Builders<BsonDocument>.Filter;
+            var test = Builders<BsonDocument>.Filter.And();
+            var doc = movie.Find(new BsonDocument()).ToList();
+            switch (Using)
+            {
+                case "Rating":
+                    {
+                        test = FilterArray.Exists("SlysPoints");
+                        doc = movie.Find(!test).Project("{Media: 0, _id:0,SlysPoints:0}").ToList();
+
+                        break;
+                    }
+                case "View":
+                    {
+                        test = Builders<BsonDocument>.Filter.And(Builders<BsonDocument>.Filter.Eq("Media", Media),
+              Builders<BsonDocument>.Filter.Exists("SlysPoints")
+              );
+                        doc = movie.Find(test).Project("{Media: 0, _id: 0}").ToList();
+
+                        break;
+                    }
+                default:
+                    { break; }
+            }
+
+
             int i = 0;
             int docNum = 0;
             char[] Trimming = { '{', '}' };
@@ -63,7 +84,7 @@ namespace MongoDB
             {
 
                 i++;
-                Console.WriteLine($"({i})   {item.ToString().Trim(Trimming)}");
+                Console.WriteLine($"({i}) {item.ToString().Trim(Trimming)}");
             }
             string Input = Console.ReadLine();
             if (Input != null)
