@@ -24,7 +24,7 @@ Connect);
 
             IMongoDatabase db = client.GetDatabase("myFirstDatabase");
 
-            var movie = db.GetCollection<BsonDocument>("Geek_Rating.Media");
+            var movie = db.GetCollection<BsonDocument>("Media");
 
 
 

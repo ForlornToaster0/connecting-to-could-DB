@@ -13,13 +13,12 @@ namespace MongoDB
 
             IMongoDatabase db = client.GetDatabase("myFirstDatabase");
 
-            var movie = db.GetCollection<BsonDocument>("Geek_Rating.Media");
+            var movie = db.GetCollection<BsonDocument>("Media");
             int docNum = Find(Connect, "true", "Rating");
             Console.WriteLine("What do you want to rate?");
-            var builder = Builders<BsonDocument>.Filter;
-            var FilterArray = builder.Exists("SlysPoints");
+
+            var FilterArray = Builders<BsonDocument>.Filter.Exists("SlysPoints");
             var doc = movie.Find(!FilterArray).Project("{Media: 0, _id:0,SlysPoints:0}").ToList();
-            int i = 0;
 
             Console.WriteLine("What's it rating?");
 
@@ -49,26 +48,25 @@ namespace MongoDB
 
             IMongoDatabase db = client.GetDatabase("myFirstDatabase");
 
-            var movie = db.GetCollection<BsonDocument>("Geek_Rating.Media");
+            var movie = db.GetCollection<BsonDocument>("Media");
 
-            var FilterArray = Builders<BsonDocument>.Filter;
-            var test = Builders<BsonDocument>.Filter.And();
+
             var doc = movie.Find(new BsonDocument()).ToList();
             switch (Using)
             {
                 case "Rating":
                     {
-                        test = FilterArray.Exists("SlysPoints");
-                        doc = movie.Find(!test).Project("{Media: 0, _id:0,SlysPoints:0}").ToList();
+                        var FilterArray = Builders<BsonDocument>.Filter.Exists("SlysPoints");
+                        doc = movie.Find(!FilterArray).Project("{Media: 0, _id:0,SlysPoints:0}").ToList();
 
                         break;
                     }
                 case "View":
                     {
-                        test = Builders<BsonDocument>.Filter.And(Builders<BsonDocument>.Filter.Eq("Media", Media),
-              Builders<BsonDocument>.Filter.Exists("SlysPoints")
-              );
-                        doc = movie.Find(test).Project("{Media: 0, _id: 0}").ToList();
+                        var FilterArray = Builders<BsonDocument>.Filter.And(Builders<BsonDocument>.Filter.Eq("Media", Media),
+               Builders<BsonDocument>.Filter.Exists("SlysPoints")
+               );
+                        doc = movie.Find(FilterArray).Project("{Media: 0, _id: 0}").ToList();
 
                         break;
                     }
@@ -77,22 +75,28 @@ namespace MongoDB
             }
 
 
+
+
             int i = 0;
-            int docNum = 0;
             char[] Trimming = { '{', '}' };
             foreach (var item in doc)
             {
 
                 i++;
                 Console.WriteLine($"({i}) {item.ToString().Trim(Trimming)}");
+
             }
-            string Input = Console.ReadLine();
-            if (Input != null)
+            if (Using == "Rating")
             {
-                docNum = int.Parse(Input) - 1;
+                string Input = Console.ReadLine();
+                if (int.TryParse(Input, out int docNum))
+                {
+                    docNum = int.Parse(Input) - 1;
+                }
+                Console.WriteLine(docNum);
+                return docNum;
             }
-            Console.WriteLine(docNum);
-            return docNum;
+            return 0;
         }
     }
 }

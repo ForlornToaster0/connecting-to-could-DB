@@ -13,7 +13,6 @@ while (true)
     connect);
     IMongoDatabase db = client.GetDatabase("myFirstDatabase");
 
-    var movie = db.GetCollection<BsonDocument>("Geek_Rating.Media");
     var database = client.GetDatabase("myFirstDatabase");
 
     bool isAlive = database.RunCommandAsync((Command<BsonDocument>)"{ping:1}").Wait(1000);
