@@ -1,11 +1,5 @@
 ﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MongoDB
 {
@@ -17,19 +11,13 @@ namespace MongoDB
             string Title;
             string Date;
 
-
-            var client = new MongoClient(
-Connect);
-
+            var client = new MongoClient(Connect);
 
             IMongoDatabase db = client.GetDatabase("myFirstDatabase");
 
             var movie = db.GetCollection<BsonDocument>("Media");
 
-
-
             Console.WriteLine("Full title?");
-
 
             Title = Console.ReadLine();
             if (Title != null)
@@ -48,6 +36,46 @@ Connect);
                 }
             }
         }
+        public static void remove(string Connect, string Using, string User)
+        {
+
+            var client = new MongoClient(Connect);
+
+
+            IMongoDatabase db = client.GetDatabase("myFirstDatabase");
+
+            var movie = db.GetCollection<BsonDocument>("Media");
+
+
+            var doc = movie.Find(new BsonDocument()).ToList();
+            switch (Using)
+            {
+                case "Remove":
+                    {
+
+                        int mediaNum = Rating.Find(Connect, "A", Using, User);
+
+                        movie.DeleteOne(doc[mediaNum]);
+
+                        break;
+
+                    }
+                case "RemoveRating":
+                    {
+
+                        var FilterArray = Builders<BsonDocument>.Filter.Exists(User);
+                        doc = movie.Find(FilterArray).ToList();
+                        int mediaNum = Rating.Find(Connect, "A", Using, User);
+
+                        var Update = Builders<BsonDocument>.Update.Unset(User);
+
+                        movie.UpdateOne(doc[mediaNum], Update);
+
+                        break;
+                    }
+
+
+            }
+        }
     }
 }
-
