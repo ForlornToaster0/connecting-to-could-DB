@@ -1,6 +1,8 @@
 ﻿using MongoDB;
 using MongoDB.Bson;
 using MongoDB.Driver;
+
+
 while (true)
 {
     Console.ForegroundColor = ConsoleColor.DarkGreen;
@@ -36,20 +38,22 @@ while (true)
                         {
                             case "1":
                                 {
-                                    Adding.Media("G", connect);
+                                    Adding adding = new(client, "G");
+                                    adding.Added();
                                     break;
                                 }
                             case "2":
                                 {
-                                    Adding.Media("S", connect);
+                                    Adding adding = new(client, "S");
+                                    adding.Added();
                                     break;
                                 }
                             case "3":
                                 {
-                                    Adding.Media("M", connect);
+                                    Adding adding = new(client, "M");
+                                    adding.Added();
                                     break;
                                 }
-
                             default:
                                 {
                                     break;
@@ -59,7 +63,12 @@ while (true)
                     }
                 case "2":
                     {
-                        Rating.Rate(connect, Username);
+
+                        Search search = new(client, "A", "Rating", Username);
+                        List<BsonDocument> docList = search.Find();
+                        int docnum = search.docNums(docList);
+                        Rating rating = new(null, null, null, null, docnum);
+                        rating.Rate(client,Username);
                         break;
                     }
                 case "3":
@@ -70,23 +79,31 @@ while (true)
                         {
                             case "1":
                                 {
-                                    Rating.Find(connect, "G", "View", Username);
+                                    Search search = new Search(client, "G", "View", Username);
+                                    List<BsonDocument> docList = search.Find();
+                                    int docnum = search.docNums(docList);
                                     break;
                                 }
                             case "2":
                                 {
-                                    Rating.Find(connect, "S", "View", Username);
+                                    Search search = new Search(client, "S", "View", Username);
+                                    List<BsonDocument> docList = search.Find();
+                                    int docnum = search.docNums(docList);
                                     break;
                                 }
                             case "3":
                                 {
-                                    Rating.Find(connect, "M", "View", Username);
+                                    Search search = new Search(client, "M", "View", Username);
+                                    List<BsonDocument> docList = search.Find();
+                                    int docnum = search.docNums(docList);
                                     break;
                                 }
                             case "4":
                                 {
 
-                                    Rating.Find(connect, "A", "View", Username);
+                                    Search search = new Search(client, "A", "View", Username);
+                                    List<BsonDocument> docList = search.Find();
+                                    int docnum = search.docNums(docList);
                                     break;
                                 }
                             default:
@@ -105,13 +122,11 @@ while (true)
                         {
                             case "1":
                                 {
-                                    Adding.remove(connect, "Remove", Username);
 
                                     break;
                                 }
-                                case"2":
+                            case "2":
                                 {
-                                    Adding.remove(connect, "RemoveRating", Username);
 
                                     break;
                                 }
@@ -121,7 +136,13 @@ while (true)
                     }
                 case "T":
                     {
-                        Testing.remove(connect, Username);
+
+                        Search search = new Search(client, "A", "Remove", Username);
+                        List<BsonDocument> docList = search.Find();
+                        int docnum = search.docNums(docList);
+
+                        Remove remove = new Remove(null, null,null, null, docnum);
+                        remove.Removed(client, Username);
                         break;
                     }
                 default:

@@ -3,17 +3,23 @@ using MongoDB.Driver;
 
 namespace MongoDB
 {
-    public class Adding
+    public class Adding 
     {
+        MongoClient Client { get; set; }
+        string Media { get; set; }
+        public Adding(MongoClient client, string media)
+        {
+            this.Client = client;
+            this.Media = media;
+        }
 
-        public static void Media(string Media, string Connect)
+        public void Added()
         {
             string Title;
             string Date;
 
-            var client = new MongoClient(Connect);
-
-            IMongoDatabase db = client.GetDatabase("myFirstDatabase");
+          
+            IMongoDatabase db = Client.GetDatabase("myFirstDatabase");
 
             var movie = db.GetCollection<BsonDocument>("Media");
 
@@ -36,46 +42,7 @@ namespace MongoDB
                 }
             }
         }
-        public static void remove(string Connect, string Using, string User)
-        {
 
-            var client = new MongoClient(Connect);
-
-
-            IMongoDatabase db = client.GetDatabase("myFirstDatabase");
-
-            var movie = db.GetCollection<BsonDocument>("Media");
-
-
-            var doc = movie.Find(new BsonDocument()).ToList();
-            switch (Using)
-            {
-                case "Remove":
-                    {
-
-                        int mediaNum = Rating.Find(Connect, "A", Using, User);
-
-                        movie.DeleteOne(doc[mediaNum]);
-
-                        break;
-
-                    }
-                case "RemoveRating":
-                    {
-
-                        var FilterArray = Builders<BsonDocument>.Filter.Exists(User);
-                        doc = movie.Find(FilterArray).ToList();
-                        int mediaNum = Rating.Find(Connect, "A", Using, User);
-
-                        var Update = Builders<BsonDocument>.Update.Unset(User);
-
-                        movie.UpdateOne(doc[mediaNum], Update);
-
-                        break;
-                    }
-
-
-            }
-        }
     }
 }
+
